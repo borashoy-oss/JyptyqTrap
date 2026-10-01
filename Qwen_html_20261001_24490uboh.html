@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<title>Жұптық жұмыс: Қисықсызықты трапецияның ауданы</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #1e293b;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+  header {
+    background: linear-gradient(135deg, #ea580c, #dc2626);
+    color: #fff;
+    padding: 24px 30px;
+  }
+  header h1 { font-size: 1.6rem; margin-bottom: 6px; }
+  header p { opacity: 0.95; font-size: 0.95rem; }
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-top: 8px;
+  }
+
+  .section {
+    padding: 24px 30px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .section h2 {
+    color: #ea580c;
+    font-size: 1.25rem;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section h2::before {
+    content: '';
+    width: 6px;
+    height: 24px;
+    background: #ea580c;
+    border-radius: 3px;
+  }
+
+  .algorithm {
+    background: #fff7ed;
+    border: 2px solid #fb923c;
+    border-radius: 12px;
+    padding: 18px 22px;
+  }
+  .algorithm ol {
+    padding-left: 22px;
+    line-height: 1.9;
+  }
+  .algorithm li { margin: 4px 0; }
+  .algorithm li b { color: #c2410c; }
+
+  .task-block {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+    border-left: 5px solid #4f46e5;
+  }
+  .task-block h3 {
+    color: #4338ca;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+  }
+  .task-text {
+    background: #eef2ff;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 14px;
+    font-family: 'Cambria Math', serif;
+    font-size: 1.05rem;
+  }
+
+  .step {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    transition: border-color 0.2s;
+  }
+  .step:hover { border-color: #4f46e5; }
+  .step-label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+  }
+  .step-label .num {
+    display: inline-block;
+    background: #4f46e5;
+    color: #fff;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 24px;
+    margin-right: 8px;
+    font-size: 0.85rem;
+  }
+  .input-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .input-row label {
+    font-weight: 500;
+    min-width: 60px;
+  }
+  input[type="text"], input[type="number"] {
+    padding: 8px 12px;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: 'Cambria Math', serif;
+    transition: border-color 0.2s;
+  }
+  input:focus {
+    outline: none;
+    border-color: #4f46e5;
+  }
+  .step-input {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .step-feedback {
+    margin-top: 8px;
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    display: none;
+  }
+  .step-feedback.ok {
+    background: #dcfce7;
+    color: #166534;
+    display: block;
+  }
+  .step-feedback.err {
+    background: #fee2e2;
+    color: #991b1b;
+    display: block;
+  }
+
+  .check-btn {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-top: 8px;
+    transition: transform 0.15s;
+  }
+  .check-btn:hover { transform: translateY(-2px); }
+
+  .graphs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 16px 0;
+  }
+  .graph-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+  .graph-card h4 {
+    color: #4338ca;
+    margin-bottom: 8px;
+    font-size: 1rem;
+  }
+  svg { max-width: 100%; height: auto; }
+
+  .score-panel {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-top: 16px;
+    text-align: center;
+  }
+  .score-panel h3 {
+    color: #92400e;
+    margin-bottom: 8px;
+  }
+  .score-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #c2410c;
+  }
+  .score-max { color: #64748b; font-size: 1rem; }
+
+  .descriptors {
+    background: #f1f5f9;
+    padding: 16px 20px;
+    border-radius: 10px;
+    margin-top: 14px;
+  }
+  .descriptors h3 {
+    color: #475569;
+    margin-bottom: 10px;
+    font-size: 1rem;
+  }
+  .descriptors ul {
+    padding-left: 20px;
+    line-height: 1.8;
+  }
+  .descriptors li::marker { color: #ea580c; }
+
+  .pair-info {
+    background: #ecfdf5;
+    border-left: 4px solid #10b981;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 14px;
+    font-size: 0.95rem;
+  }
+  .pair-info b { color: #065f46; }
+
+  .final-result {
+    background: #fff;
+    border: 2px dashed #4f46e5;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-family: 'Cambria Math', serif;
+    font-size: 1.1rem;
+    margin-top: 10px;
+  }
+
+  @media (max-width: 700px) {
+    .graphs { grid-template-columns: 1fr; }
+    .section { padding: 18px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>👥 Жұптық жұмыс: «Формуланы қолдан»</h1>
+    <p>Қисықсызықты трапецияның ауданын анықталған интеграл арқылы есептеу</p>
+    <span class="badge">⏱ 10 минут · 👥 Жұпта орындау</span>
+  </header>
+
+  <!-- Алгоритм -->
+  <div class="section">
+    <h2>📋 Орындалу алгоритмі</h2>
+    <div class="algorithm">
+      <ol>
+        <li><b>1-қадам.</b> Интегралдау шектерін анықтау (a, b);</li>
+        <li><b>2-қадам.</b> Анықталған интеграл құру: ∫<sub>a</sub><sup>b</sup> f(x) dx;</li>
+        <li><b>3-қадам.</b> Алғашқы функцияны табу: F(x);</li>
+        <li><b>4-қадам.</b> Ньютон–Лейбниц формуласымен есептеу: S = F(b) − F(a).</li>
+      </ol>
+    </div>
+    <div class="pair-info">
+      💡 <b>Нұсқау:</b> Жұптасыңызбен бірге әр қадамды талқылаңыз. Әр дұрыс қадам — <b>1 балл</b>. Барлығы <b>8 балл</b> жинауға болады.
+    </div>
+  </div>
+
+  <!-- Графиктер -->
+  <div class="section">
+    <h2>📈 Функция графиктері</h2>
+    <div class="graphs">
+      <div class="graph-card">
+        <h4>а) y = x, 0 ≤ x ≤ 2</h4>
+        <svg viewBox="0 0 260 220" width="260" height="220">
+          <line x1="30" y1="190" x2="240" y2="190" stroke="#333" stroke-width="1.5"/>
+          <line x1="30" y1="190" x2="30" y2="20" stroke="#333" stroke-width="1.5"/>
+          <polygon points="240,190 232,186 232,194" fill="#333"/>
+          <polygon points="30,20 26,28 34,28" fill="#333"/>
+          <text x="245" y="195" font-size="12" font-weight="bold">x</text>
+          <text x="22" y="18" font-size="12" font-weight="bold">y</text>
+          <!-- a=0, b=2 -->
+          <text x="27" y="205" font-size="11">0</text>
+          <line x1="180" y1="190" x2="180" y2="195" stroke="#333"/>
+          <text x="177" y="205" font-size="11">2</text>
+          <!-- y=x сызығы -->
+          <line x1="30" y1="190" x2="180" y2="40" stroke="#4f46e5" stroke-width="2.5"/>
+          <text x="185" y="38" font-size="12" fill="#4f46e5" font-weight="bold">y=x</text>
+          <!-- Трапеция (үшбұрыш) -->
+          <path d="M 30 190 L 180 190 L 180 40 Z" fill="#a5b4fc" fill-opacity="0.4" stroke="#4f46e5" stroke-dasharray="3,2"/>
+          <text x="90" y="170" font-size="18" fill="#4338ca" font-style="italic" font-weight="bold">S</text>
+        </svg>
+      </div>
+      <div class="graph-card">
+        <h4>ә) y = 4−x², 0 ≤ x ≤ 2</h4>
+        <svg viewBox="0 0 260 220" width="260" height="220">
+          <line x1="30" y1="190" x2="240" y2="190" stroke="#333" stroke-width="1.5"/>
+          <line x1="30" y1="190" x2="30" y2="20" stroke="#333" stroke-width="1.5"/>
+          <polygon points="240,190 232,186 232,194" fill="#333"/>
+          <polygon points="30,20 26,28 34,28" fill="#333"/>
+          <text x="245" y="195" font-size="12" font-weight="bold">x</text>
+          <text x="22" y="18" font-size="12" font-weight="bold">y</text>
+          <!-- Мәндер -->
+          <text x="27" y="205" font-size="11">0</text>
+          <line x1="180" y1="190" x2="180" y2="195" stroke="#333"/>
+          <text x="177" y="205" font-size="11">2</text>
+          <text x="10" y="55" font-size="11">4</text>
+          <line x1="25" y1="50" x2="30" y2="50" stroke="#333"/>
+          <!-- y=4-x² параболасы -->
+          <path d="M 30 50 Q 105 30, 180 110" stroke="#dc2626" stroke-width="2.5" fill="none"/>
+          <text x="185" y="115" font-size="12" fill="#dc2626" font-weight="bold">y=4−x²</text>
+          <!-- Трапеция -->
+          <path d="M 30 50 Q 105 30, 180 110 L 180 190 L 30 190 Z" fill="#fca5a5" fill-opacity="0.4" stroke="#dc2626" stroke-dasharray="3,2"/>
+          <text x="90" y="160" font-size="18" fill="#991b1b" font-style="italic" font-weight="bold">S</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- а) есебі -->
+  <div class="section">
+    <h2>📘 а) есебі: y = x, 0 ≤ x ≤ 2</h2>
+    <div class="task-block">
+      <div class="task-text">f(x) = x, a = 0, b = 2</div>
+
+      <div class="step">
+        <span class="step-label"><span class="num">1</span>Интеграл шектерін жазыңыз:</span>
+        <div class="input-row">
+          <label>a =</label><input type="number" id="a1_a" class="step-input" placeholder="мысалы: 0">
+          <label>b =</label><input type="number" id="b1_a" class="step-input" placeholder="мысалы: 2">
+        </div>
+        <button class="check-btn" onclick="checkStep('a1', 0, 2)">Тексеру</button>
+        <div id="fb_a1" class="step-feedback"></div>
+      </div>
+
+      <div class="step">
+        <span class="step-label"><span class="num">2</span>Интеграл астындағы функцияны жазыңыз:</span>
+        <div class="input-row">
+          <label>f(x) =</label><input type="text" id="f1_a" class="step-input" placeholder="мысалы: x">
+        </div>
+        <button class="check-btn" onclick="checkF('a', 1, ['x'])">Тексеру</button>
+        <div id="fb_f1_a" class="step-feedback"></div>
+      </div>
+
+      <div class="step">
+        <span class="step-label"><span class="num">3</span>Алғашқы функцияны жазыңыз:</span>
+        <div class="input-row">
+          <label>F(x) =</label><input type="text" id="F1_a" class="step-input" placeholder="мысалы: x^2/2">
+        </div>
+        <button class="check-btn" onclick="checkF('a', 2, ['x^2/2','x²/2','(x^2)/2','x^(2)/2','0.5x^2','0.5*x^2','x^2/2'])">Тексеру</button>
+        <div id="fb_F1_a" class="step-feedback"></div>
+      </div>
+
+      <div class="step">
+        <span class="step-label"><span class="num">4</span>Ньютон–Лейбниц формуласымен есептеңіз:</span>
+        <div class="input-row">
+          <label>F(b) =</label><input type="text" id="Fb1_a" class="step-input" placeholder="мысалы: 2">
+          <label>F(a) =</label><input type="text" id="Fa1_a" class="step-input" placeholder="мысалы: 0">
+        </div>
+        <div class="input-row" style="margin-top:8px;">
+          <label><b>S =</b></label><input type="text" id="S1_a" class="step-input" placeholder="мысалы: 2">
+        </div>
+        <button class="check-btn" onclick="checkFinal('a', 1)">Тексеру</button>
+        <div id="fb_S1_a" class="step-feedback"></div>
+      </div>
+
+      <div class="final-result">
+        ✅ Дұрыс жауап: <b>S = ∫<sub>0</sub><sup>2</sup> x dx = [x²/2]<sub>0</sub><sup>2</sup> = 2 − 0 = 2</b>
+      </div>
+    </div>
+  </div>
+
+  <!-- ә) есебі -->
+  <div class="section">
+    <h2>📗 ә) есебі: y = 4 − x², 0 ≤ x ≤ 2</h2>
+    <div class="task-block">
+      <div class="task-text">f(x) = 4 − x², a = 0, b = 2</div>
+
+      <div class="step">
+        <span class="step-label"><span class="num">1</span>Интеграл шектерін жазыңыз:</span>
+        <div class="input-row">
+          <label>a =</label><input type="number" id="a1_b" class="step-input" placeholder="мысалы: 0">
+          <label>b =</label><input type="number" id="b1_b" class="step-input" placeholder="мысалы: 2">
+        </div>
+        <button class="check-btn" onclick="checkStep('b1', 0, 2)">Тексеру</button>
+        <div id="fb_b1" class="step-feedback"></div>
+      </div>
+
+      <div class="step">
+        <span class="step-label"><span class="num">2</span>Интеграл астындағы функцияны жазыңыз:</span>
+        <div class="input-row">
+          <label>f(x) =</label><input type="text" id="f1_b" class="step-input" placeholder="мысалы: 4-x^2">
+        </div>
+        <button class="check-btn" onclick="checkF('b', 1, ['4-x^2','4-x²','4 - x^2','4 - x²','-x^2+4','-x²+4'])">Тексеру</button>
+        <div id="fb_f1_b" class="step-feedback"></div>
+      </div>
+
+      <div class="step">
+        <span class="step-label"><span class="num">3</span>Алғашқы функцияны жазыңыз:</span>
+        <div class="input-row">
+          <label>F(x) =</label><input type="text" id="F1_b" class="step-input" placeholder="мысалы: 4x-x^3/3">
+        </div>
+        <button class="check-btn" onclick="checkF('b', 2, ['4x-x^3/3','4x-x³/3','4*x-x^3/3','4x-(x^3)/3','4x-x^(3)/3','-x^3/3+4x'])">Тексеру</button>
+        <div id="fb_F1_b" class="step-feedback"></div>
+      </div>
+
+      <div class="step">
+        <span class="step-label"><span class="num">4</span>Ньютон–Лейбниц формуласымен есептеңіз:</span>
+        <div class="input-row">
+          <label>F(b) =</label><input type="text" id="Fb1_b" class="step-input" placeholder="мысалы: 16/3">
+          <label>F(a) =</label><input type="text" id="Fa1_b" class="step-input" placeholder="мысалы: 0">
+        </div>
+        <div class="input-row" style="margin-top:8px;">
+          <label><b>S =</b></label><input type="text" id="S1_b" class="step-input" placeholder="мысалы: 16/3">
+        </div>
+        <button class="check-btn" onclick="checkFinal('b', 1)">Тексеру</button>
+        <div id="fb_S1_b" class="step-feedback"></div>
+      </div>
+
+      <div class="final-result">
+        ✅ Дұрыс жауап: <b>S = ∫<sub>0</sub><sup>2</sup> (4−x²) dx = [4x − x³/3]<sub>0</sub><sup>2</sup> = (8 − 8/3) − 0 = 16/3</b>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ұпай -->
+  <div class="section">
+    <h2>🏆 Жиналған ұпай</h2>
+    <div class="score-panel">
+      <h3>Сіздің нәтижеңіз:</h3>
+      <div class="score-value"><span id="score">0</span> <span class="score-max">/ 8 балл</span></div>
+      <p id="score-msg" style="margin-top:10px; color:#92400e;"></p>
+      <button class="check-btn" style="background: linear-gradient(135deg, #ea580c, #dc2626); margin-top:10px;" onclick="resetAll()">🔄 Қайта бастау</button>
+    </div>
+
+    <div class="descriptors">
+      <h3>📋 Дескрипторлар (әр дұрыс қадам — 1 балл):</h3>
+      <ul>
+        <li>Интеграл шектерін дұрыс қояды;</li>
+        <li>Интеграл астындағы функцияны дұрыс жазады;</li>
+        <li>Алғашқы функцияны дұрыс табады;</li>
+        <li>Ньютон–Лейбниц формуласын дұрыс қолданады.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let score = 0;
+const done = {};
+
+function normalize(s) {
+  return s.toString().trim().toLowerCase().replace(/\s+/g,'').replace('²','^2').replace('³','^3');
+}
+
+function showFb(id, ok, msg) {
+  const el = document.getElementById('fb_' + id);
+  el.className = 'step-feedback ' + (ok ? 'ok' : 'err');
+  el.innerHTML = (ok ? '✅ ' : '❌ ') + msg;
+}
+
+function addScore(key, pts) {
+  if (done[key]) return;
+  done[key] = true;
+  score += pts;
+  document.getElementById('score').textContent = score;
+  updateMsg();
+}
+
+function updateMsg() {
+  const msg = document.getElementById('score-msg');
+  if (score === 0) msg.textContent = 'Тапсырманы орындауды бастаңыз!';
+  else if (score < 4) msg.textContent = 'Жақсы бастама! Тағы жұмыс істеңіз 💪';
+  else if (score < 8) msg.textContent = 'Тамаша! Аздап қалды 🎯';
+  else msg.textContent = '🎉 Керемет! Барлық тапсырманы орындадыңыз!';
+}
+
+function checkStep(key, a, b) {
+  const aVal = parseFloat(document.getElementById('a1_' + key[1]).value);
+  const bVal = parseFloat(document.getElementById('b1_' + key[1]).value);
+  const fbId = 'fb_' + key;
+  if (aVal === a && bVal === b) {
+    showFb(key, true, 'Шектер дұрыс: a = ' + a + ', b = ' + b);
+    addScore('step_' + key, 1);
+  } else {
+    showFb(key, false, 'Қате. a = ' + a + ', b = ' + b + ' болуы керек.');
+  }
+}
+
+function checkF(task, step, variants) {
+  const id = step === 1 ? 'f1_' + task : 'F1_' + task;
+  const val = normalize(document.getElementById(id).value);
+  const fbId = (step === 1 ? 'f1_' : 'F1_') + task;
+  const ok = variants.some(v => normalize(v) === val);
+  if (ok) {
+    showFb(fbId, true, 'Дұрыс!');
+    addScore('step_' + fbId, 1);
+  } else {
+    showFb(fbId, false, 'Қате. Қайта тексеріңіз.');
+  }
+}
+
+function parseNum(s) {
+  s = s.trim().replace(',', '.');
+  // бөлшек түрінде: 16/3
+  if (s.includes('/')) {
+    const parts = s.split('/');
+    if (parts.length === 2) {
+      const n = parseFloat(parts[0]);
+      const d = parseFloat(parts[1]);
+      if (!isNaN(n) && !isNaN(d) && d !== 0) return n/d;
+    }
+    return NaN;
+  }
+  return parseFloat(s);
+}
+
+function checkFinal(task, step) {
+  const FbId = 'Fb1_' + task;
+  const FaId = 'Fa1_' + task;
+  const SId = 'S1_' + task;
+  const Fb = parseNum(document.getElementById(FbId).value);
+  const Fa = parseNum(document.getElementById(FaId).value);
+  const S = parseNum(document.getElementById(SId).value);
+
+  let expectedFb, expectedFa, expectedS;
+  if (task === 'a') {
+    expectedFb = 2; expectedFa = 0; expectedS = 2;
+  } else {
+    expectedFb = 16/3; expectedFa = 0; expectedS = 16/3;
+  }
+
+  const tol = 0.01;
+  const FbOk = !isNaN(Fb) && Math.abs(Fb - expectedFb) < tol;
+  const FaOk = !isNaN(Fa) && Math.abs(Fa - expectedFa) < tol;
+  const SOk = !isNaN(S) && Math.abs(S - expectedS) < tol;
+
+  if (FbOk && FaOk && SOk) {
+    showFb('S1_' + task, true, 'Барлығы дұрыс! S = ' + expectedS);
+    addScore('step_S1_' + task, 1);
+  } else {
+    let msg = 'Қате. ';
+    if (!FbOk) msg += 'F(b) қате. ';
+    if (!FaOk) msg += 'F(a) қате. ';
+    if (!SOk) msg += 'S қате. ';
+    showFb('S1_' + task, false, msg);
+  }
+}
+
+function resetAll() {
+  if (!confirm('Барлық жауаптарды өшіріп, қайта бастайсыз ба?')) return;
+  document.querySelectorAll('input').forEach(i => i.value = '');
+  document.querySelectorAll('.step-feedback').forEach(f => {
+    f.className = 'step-feedback';
+    f.innerHTML = '';
+  });
+  score = 0;
+  for (let k in done) delete done[k];
+  document.getElementById('score').textContent = 0;
+  updateMsg();
+}
+
+updateMsg();
+</script>
+</body>
+</html>
